@@ -33,7 +33,6 @@ class BoardControllerTest {
                                       .content("test")
                                       .writerId("user")
                                       .build();
-
     //when
     mockMvc.perform(post("/posts")
       .accept(MediaType.APPLICATION_JSON)
@@ -41,6 +40,6 @@ class BoardControllerTest {
     )
     //then
     .andDo(print())
-    .andExpect(status().isOk());
+    .andExpect(status().isCreated());
   }
 }
