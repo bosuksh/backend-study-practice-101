@@ -117,7 +117,7 @@ class BoardControllerTest {
                                      .build();
     given(boardService.updatePost(any(), any())).willReturn(Optional.of(mockResponse));
     //when
-    mockMvc.perform(patch("/posts/1")
+    mockMvc.perform(put("/posts/1")
       .contentType(MediaType.APPLICATION_JSON)
       .content(objectMapper.writeValueAsString(mockRequest))
     )
@@ -127,6 +127,22 @@ class BoardControllerTest {
     .andExpect(jsonPath(".id").value(1))
     .andExpect(jsonPath(".title").value(mockRequest.getTitle()))
     .andExpect(jsonPath(".content").value(mockRequest.getContent()));
+  }
+
+  @Test
+  @DisplayName("게시글 삭제")
+  public void deletePost() throws Exception {
+    //given
+
+
+    //given(boardService.deletePost(any())).willReturn(Optional.of(mockResponse));
+    //when
+    mockMvc.perform(put("/posts/1")
+                      .contentType(MediaType.APPLICATION_JSON)
+    )
+      //then
+      .andDo(print())
+      .andExpect(status().is2xxSuccessful());
   }
 
 

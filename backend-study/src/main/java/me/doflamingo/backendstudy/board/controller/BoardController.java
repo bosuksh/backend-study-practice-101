@@ -38,7 +38,7 @@ public class BoardController {
     return ResponseEntity.ok(postResponseDto);
   }
 
-  @PatchMapping("/{id}")
+  @PutMapping("/{id}")
   public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) throws NotFoundException {
     PostResponseDto postResponseDto = boardService.updatePost(id, requestDto)
                                         .orElseThrow(() -> new NotFoundException("post is not found"));
