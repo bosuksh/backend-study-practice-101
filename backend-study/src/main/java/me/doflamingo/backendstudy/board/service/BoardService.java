@@ -22,4 +22,8 @@ public class BoardService {
   public Optional<PostResponseDto> updatePost(Long id, PostRequestDto requestDto) {
     return null;
   }
+
+  public void deletePost(Long id) {
+
+  }
 }

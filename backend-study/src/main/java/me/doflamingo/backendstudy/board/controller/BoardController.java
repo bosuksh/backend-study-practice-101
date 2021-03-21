@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.doflamingo.backendstudy.board.dto.PostRequestDto;
 import me.doflamingo.backendstudy.board.dto.PostResponseDto;
 import me.doflamingo.backendstudy.board.service.BoardService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +46,11 @@ public class BoardController {
     return ResponseEntity.ok(postResponseDto);
   }
 
-
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deletePost(@PathVariable Long id) {
+    boardService.deletePost(id);
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+  }
 
 
 }

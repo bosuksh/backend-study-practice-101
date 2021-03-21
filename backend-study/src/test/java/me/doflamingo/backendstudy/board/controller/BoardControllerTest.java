@@ -137,7 +137,7 @@ class BoardControllerTest {
 
     //given(boardService.deletePost(any())).willReturn(Optional.of(mockResponse));
     //when
-    mockMvc.perform(put("/posts/1")
+    mockMvc.perform(delete("/posts/1")
                       .contentType(MediaType.APPLICATION_JSON)
     )
       //then
