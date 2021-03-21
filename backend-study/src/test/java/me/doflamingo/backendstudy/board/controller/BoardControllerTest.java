@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,11 +67,6 @@ class BoardControllerTest {
   @DisplayName("게시글 리스트 조회")
   public void getPosts() throws Exception {
     //given
-    PostRequestDto mockRequest = PostRequestDto.builder()
-                                   .title("Test1")
-                                   .content("test")
-                                   .writerId("user")
-                                   .build();
     List<PostResponseDto> mockResponseList = new ArrayList<>();
     for(long i = 1L; i < 11L; i++){
       mockResponseList.add(generateResponseDto(i));
@@ -85,6 +81,26 @@ class BoardControllerTest {
       .andDo(print())
       .andExpect(status().isOk());
   }
+
+  @Test
+  @DisplayName("게시글 조회")
+  public void getPostById() throws Exception {
+    //given
+
+    PostResponseDto mockResponse = generateResponseDto(1L);
+
+    given(boardService.getPostById()).willReturn(Optional.of(mockResponse));
+    //when
+    mockMvc.perform(get("/posts/1")
+                      .contentType(MediaType.APPLICATION_JSON)
+    )
+      //then
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath(".id").value(1L));
+  }
+
+
 
   private PostResponseDto generateResponseDto(Long id) {
     return PostResponseDto.builder()
