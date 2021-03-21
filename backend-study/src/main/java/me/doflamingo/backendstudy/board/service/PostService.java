@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 @Service
 @Transactional
@@ -46,18 +47,33 @@ public class PostService {
 
   @Transactional(readOnly = true)
   public Optional<PostResponseDto> getPostById(Long id) throws NotFoundException {
-    Post findPost = postRepository.findById(id).orElseThrow(()-> new NotFoundException("Post is Not Found"));
+    Post findPost = postRepository.findById(id).orElseThrow(Post_is_not_found());
     return Optional.of(changePostToPostResponseDto(findPost));
   }
 
-  public Optional<PostResponseDto> updatePost(Long id, PostRequestDto requestDto) {
-    return null;
+  public Optional<PostResponseDto> updatePost(Long id, PostRequestDto requestDto) throws NotFoundException {
+    Post findPost = postRepository.findById(id).orElseThrow(Post_is_not_found());
+
+    Post updatePost = Post.builder()
+                        .id(findPost.getId())
+                        .title(requestDto.getTitle())
+                        .content(requestDto.getContent())
+                        .writerId(requestDto.getWriterId())
+                        .createdAt(findPost.getCreatedAt())
+                        .updatedAt(LocalDateTime.now())
+                        .build();
+    Post updatedPost = postRepository.save(updatePost);
+    return Optional.of(changePostToPostResponseDto(updatedPost));
   }
 
   public void deletePost(Long id) throws NotFoundException {
-    Post post = postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post is Not Found"));
+    Post post = postRepository.findById(id).orElseThrow(Post_is_not_found());
     postRepository.delete(post);
 
+  }
+
+  private Supplier<NotFoundException> Post_is_not_found() {
+    return () -> new NotFoundException("Post is Not Found");
   }
 
   private PostResponseDto changePostToPostResponseDto(Post post) {

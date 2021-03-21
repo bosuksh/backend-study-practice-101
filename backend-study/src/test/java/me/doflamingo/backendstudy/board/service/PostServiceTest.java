@@ -76,7 +76,7 @@ class PostServiceTest {
 
   @Test
   @DisplayName("게시물 리스트 조회")
-  public void getPostList() throws Exception {
+  public void getPostList() {
     //given
 
     List<Post> postList = new ArrayList<>();
@@ -93,6 +93,35 @@ class PostServiceTest {
     assertEquals(postResponseList.size(), 10);
 
   }
+
+  @Test
+  @DisplayName("게시물 수정")
+  public void updatePost() throws NotFoundException {
+    //given
+    Long fakeId = 1L;
+    Long newId = 2L;
+    PostRequestDto mockRequest = createRequest(fakeId);
+    Post savedPost = CreatePost(mockRequest, fakeId);
+
+    PostRequestDto updateRequest = createRequest(newId);
+    Post updatedPost = CreatePost(updateRequest, fakeId);
+
+
+    given(postRepository.findById(1L)).willReturn(Optional.of(savedPost));
+    given(postRepository.save(any())).willReturn(updatedPost);
+    //when
+    PostResponseDto postResponseDto = postService.updatePost(fakeId,updateRequest).orElseThrow(() -> new NotFoundException("Post is Not Found"));
+
+    //then
+    assertNotEquals(postResponseDto.getTitle(), savedPost.getTitle());
+    assertEquals(postResponseDto.getId(), updatedPost.getId());
+    assertEquals(postResponseDto.getTitle(), updatedPost.getTitle());
+    assertEquals(postResponseDto.getContent(), updatedPost.getContent());
+    assertEquals(postResponseDto.getWriterId(), updatedPost.getWriterId());
+
+  }
+
+
   @Test
   @DisplayName("게시물 삭제")
   public void deletePost() throws Exception {
@@ -112,9 +141,11 @@ class PostServiceTest {
 
   }
 
+
+
   @Test
   @DisplayName("게시물 삭제 예외")
-  public void deletePostWithException() throws Exception {
+  public void deletePostWithException() {
     //given
     Long fakeId = 1L;
 
