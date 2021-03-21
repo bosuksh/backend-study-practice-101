@@ -108,13 +108,14 @@ class BoardControllerTest {
                                .writerId("user")
                                .build();
     PostResponseDto mockResponse = PostResponseDto.builder()
+                                     .id(1L)
                                      .title(mockRequest.getTitle())
                                      .content(mockRequest.getContent())
                                      .writerId(mockRequest.getWriterId())
                                      .createdAt(LocalDateTime.now())
                                      .updatedAt(LocalDateTime.now())
                                      .build();
-    given(boardService.updatePost(1L)).willReturn(Optional.of(mockResponse));
+    given(boardService.updatePost(any(), any())).willReturn(Optional.of(mockResponse));
     //when
     mockMvc.perform(patch("/posts/1")
       .contentType(MediaType.APPLICATION_JSON)

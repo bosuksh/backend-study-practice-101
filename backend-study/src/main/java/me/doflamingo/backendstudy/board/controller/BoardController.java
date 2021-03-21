@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,9 +33,18 @@ public class BoardController {
 
   @GetMapping("/{id}")
   public ResponseEntity<?> getPost(@PathVariable Long id) throws NotFoundException {
-    PostResponseDto postResponseDto = boardService.getPostById(id).orElseThrow(() -> new NotFoundException("post is not found"));
+    PostResponseDto postResponseDto = boardService.getPostById(id)
+                                        .orElseThrow(() -> new NotFoundException("post is not found"));
     return ResponseEntity.ok(postResponseDto);
   }
+
+  @PatchMapping("/{id}")
+  public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostRequestDto requestDto) throws NotFoundException {
+    PostResponseDto postResponseDto = boardService.updatePost(id, requestDto)
+                                        .orElseThrow(() -> new NotFoundException("post is not found"));
+    return ResponseEntity.ok(postResponseDto);
+  }
+
 
 
 

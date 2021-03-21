@@ -19,7 +19,7 @@ public class BoardService {
     return null;
   }
 
-  public Optional<PostResponseDto> updatePost(Long id) {
+  public Optional<PostResponseDto> updatePost(Long id, PostRequestDto requestDto) {
     return null;
   }
 }
