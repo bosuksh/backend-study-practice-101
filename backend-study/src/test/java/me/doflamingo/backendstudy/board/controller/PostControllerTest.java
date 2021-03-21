@@ -3,7 +3,7 @@ package me.doflamingo.backendstudy.board.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.doflamingo.backendstudy.board.dto.PostRequestDto;
 import me.doflamingo.backendstudy.board.dto.PostResponseDto;
-import me.doflamingo.backendstudy.board.service.BoardService;
+import me.doflamingo.backendstudy.board.service.PostService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(BoardController.class)
-class BoardControllerTest {
+@WebMvcTest(PostController.class)
+class PostControllerTest {
 
   @Autowired
   MockMvc mockMvc;
@@ -35,7 +35,7 @@ class BoardControllerTest {
   ObjectMapper objectMapper;
 
   @MockBean
-  BoardService boardService;
+  PostService postService;
 
   @Test
   @DisplayName("게시글 작성")
@@ -47,7 +47,7 @@ class BoardControllerTest {
                                       .writerId("user")
                                       .build();
     PostResponseDto mockResponse = generateResponseDto(1L);
-    given(boardService.writePost(any())).willReturn(mockResponse);
+    given(postService.writePost(any())).willReturn(mockResponse);
     //when
     mockMvc.perform(post("/posts")
       .contentType(MediaType.APPLICATION_JSON)
@@ -69,7 +69,7 @@ class BoardControllerTest {
       mockResponseList.add(generateResponseDto(i));
     }
 
-    given(boardService.getPostList()).willReturn(mockResponseList);
+    given(postService.getPostList()).willReturn(mockResponseList);
     //when
     mockMvc.perform(get("/posts")
                       .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +86,7 @@ class BoardControllerTest {
 
     PostResponseDto mockResponse = generateResponseDto(1L);
 
-    given(boardService.getPostById(any())).willReturn(Optional.of(mockResponse));
+    given(postService.getPostById(any())).willReturn(Optional.of(mockResponse));
     //when
     mockMvc.perform(get("/posts/1")
                       .contentType(MediaType.APPLICATION_JSON)
@@ -115,7 +115,7 @@ class BoardControllerTest {
                                      .createdAt(LocalDateTime.now())
                                      .updatedAt(LocalDateTime.now())
                                      .build();
-    given(boardService.updatePost(any(), any())).willReturn(Optional.of(mockResponse));
+    given(postService.updatePost(any(), any())).willReturn(Optional.of(mockResponse));
     //when
     mockMvc.perform(put("/posts/1")
       .contentType(MediaType.APPLICATION_JSON)

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import me.doflamingo.backendstudy.board.domain.Post;
 import me.doflamingo.backendstudy.board.dto.PostRequestDto;
 import me.doflamingo.backendstudy.board.dto.PostResponseDto;
-import me.doflamingo.backendstudy.board.repository.BoardRepository;
+import me.doflamingo.backendstudy.board.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +18,9 @@ import java.util.Optional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class BoardService {
+public class PostService {
 
-  private final BoardRepository boardRepository;
+  private final PostRepository postRepository;
 
   public PostResponseDto writePost(PostRequestDto requestDto) {
     Post post = Post.builder()
@@ -29,14 +29,14 @@ public class BoardService {
                   .writerId(requestDto.getWriterId())
                   .createdAt(LocalDateTime.now())
                   .build();
-    Post savedPost = boardRepository.save(post);
+    Post savedPost = postRepository.save(post);
 
     return changePostToPostResponseDto(savedPost);
   }
 
   @Transactional(readOnly = true)
   public List<PostResponseDto> getPostList() {
-    List<Post> postList = boardRepository.findAll();
+    List<Post> postList = postRepository.findAll();
     List<PostResponseDto> postResponseList = new ArrayList<>();
     for (Post post : postList) {
       postResponseList.add(changePostToPostResponseDto(post));
@@ -46,7 +46,7 @@ public class BoardService {
 
   @Transactional(readOnly = true)
   public Optional<PostResponseDto> getPostById(Long id) throws NotFoundException {
-    Post findPost = boardRepository.findById(id).orElseThrow(()-> new NotFoundException("Post is Not Found"));
+    Post findPost = postRepository.findById(id).orElseThrow(()-> new NotFoundException("Post is Not Found"));
     return Optional.of(changePostToPostResponseDto(findPost));
   }
 
@@ -54,7 +54,9 @@ public class BoardService {
     return null;
   }
 
-  public void deletePost(Long id) {
+  public void deletePost(Long id) throws NotFoundException {
+    Post post = postRepository.findById(id).orElseThrow(() -> new NotFoundException("Post is Not Found"));
+    postRepository.delete(post);
 
   }
 

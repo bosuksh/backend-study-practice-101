@@ -4,13 +4,12 @@ import javassist.NotFoundException;
 import me.doflamingo.backendstudy.board.domain.Post;
 import me.doflamingo.backendstudy.board.dto.PostRequestDto;
 import me.doflamingo.backendstudy.board.dto.PostResponseDto;
-import me.doflamingo.backendstudy.board.repository.BoardRepository;
+import me.doflamingo.backendstudy.board.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
@@ -23,13 +22,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(SpringExtension.class)
-class BoardServiceTest {
+class PostServiceTest {
 
   @InjectMocks
-  BoardService boardService;
+  PostService postService;
 
   @Mock
-  BoardRepository boardRepository;
+  PostRepository postRepository;
 
 
   @Test
@@ -41,9 +40,9 @@ class BoardServiceTest {
 
     Post savedPost = CreatePost(mockRequest, fakeId);
 
-    given(boardRepository.save(any())).willReturn(savedPost);
+    given(postRepository.save(any())).willReturn(savedPost);
     //when
-    PostResponseDto postResponseDto = boardService.writePost(mockRequest);
+    PostResponseDto postResponseDto = postService.writePost(mockRequest);
 
     //then
     assertEquals(postResponseDto.getId(), savedPost.getId());
@@ -63,9 +62,9 @@ class BoardServiceTest {
 
     Post savedPost = CreatePost(mockRequest, fakeId);
 
-    given(boardRepository.findById(fakeId)).willReturn(Optional.of(savedPost));
+    given(postRepository.findById(fakeId)).willReturn(Optional.of(savedPost));
     //when
-    PostResponseDto postResponseDto = boardService.getPostById(fakeId).get();
+    PostResponseDto postResponseDto = postService.getPostById(fakeId).get();
 
     //then
     assertEquals(postResponseDto.getId(), fakeId);
@@ -86,12 +85,46 @@ class BoardServiceTest {
       postList.add(CreatePost(mockRequest, i));
     }
 
-    given(boardRepository.findAll()).willReturn(postList);
+    given(postRepository.findAll()).willReturn(postList);
     //when
-    List<PostResponseDto> postResponseList = boardService.getPostList();
+    List<PostResponseDto> postResponseList = postService.getPostList();
 
     //then
     assertEquals(postResponseList.size(), 10);
+
+  }
+  @Test
+  @DisplayName("게시물 삭제")
+  public void deletePost() throws Exception {
+    //given
+    Long fakeId = 1L;
+
+    PostRequestDto mockRequest = createRequest(fakeId);
+    Post post = CreatePost(mockRequest, fakeId);
+
+
+    given(postRepository.findById(fakeId)).willReturn(Optional.of(post));
+    //when
+    postService.deletePost(fakeId);
+
+    //then
+    assertDoesNotThrow(() -> new NotFoundException("Post is Not Found"));
+
+  }
+
+  @Test
+  @DisplayName("게시물 삭제 예외")
+  public void deletePostWithException() throws Exception {
+    //given
+    Long fakeId = 1L;
+
+    PostRequestDto mockRequest = createRequest(fakeId);
+    Post post = CreatePost(mockRequest, fakeId);
+
+
+    given(postRepository.findById(fakeId)).willReturn(Optional.of(post));
+    //when
+    assertThrows(NotFoundException.class,() -> postService.deletePost(2L));
 
   }
 
