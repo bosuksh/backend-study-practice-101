@@ -15,7 +15,11 @@ public class BoardService {
     return null;
   }
 
-  public Optional<PostResponseDto> getPostById() {
+  public Optional<PostResponseDto> getPostById(Long id) {
+    return null;
+  }
+
+  public Optional<PostResponseDto> updatePost(Long id) {
     return null;
   }
 }

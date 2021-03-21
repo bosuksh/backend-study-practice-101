@@ -18,12 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -89,7 +86,7 @@ class BoardControllerTest {
 
     PostResponseDto mockResponse = generateResponseDto(1L);
 
-    given(boardService.getPostById()).willReturn(Optional.of(mockResponse));
+    given(boardService.getPostById(any())).willReturn(Optional.of(mockResponse));
     //when
     mockMvc.perform(get("/posts/1")
                       .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +94,38 @@ class BoardControllerTest {
       //then
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(jsonPath(".id").value(1L));
+      .andExpect(jsonPath(".id").value(1));
+  }
+
+  @Test
+  @DisplayName("게시글 수정")
+  public void updatePost() throws Exception {
+    //given
+
+    PostRequestDto mockRequest = PostRequestDto.builder()
+                               .title("test2")
+                               .content("test2")
+                               .writerId("user")
+                               .build();
+    PostResponseDto mockResponse = PostResponseDto.builder()
+                                     .title(mockRequest.getTitle())
+                                     .content(mockRequest.getContent())
+                                     .writerId(mockRequest.getWriterId())
+                                     .createdAt(LocalDateTime.now())
+                                     .updatedAt(LocalDateTime.now())
+                                     .build();
+    given(boardService.updatePost(1L)).willReturn(Optional.of(mockResponse));
+    //when
+    mockMvc.perform(patch("/posts/1")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(objectMapper.writeValueAsString(mockRequest))
+    )
+      //then
+    .andDo(print())
+    .andExpect(status().isOk())
+    .andExpect(jsonPath(".id").value(1))
+    .andExpect(jsonPath(".title").value(mockRequest.getTitle()))
+    .andExpect(jsonPath(".content").value(mockRequest.getContent()));
   }
 
 

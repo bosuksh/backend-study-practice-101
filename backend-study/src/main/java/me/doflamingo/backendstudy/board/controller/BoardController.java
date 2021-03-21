@@ -1,5 +1,6 @@
 package me.doflamingo.backendstudy.board.controller;
 
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.doflamingo.backendstudy.board.dto.PostRequestDto;
 import me.doflamingo.backendstudy.board.dto.PostResponseDto;
@@ -27,6 +28,12 @@ public class BoardController {
   @GetMapping
   public ResponseEntity<?> getPostList() {
     return ResponseEntity.ok(boardService.getPostList());
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getPost(@PathVariable Long id) throws NotFoundException {
+    PostResponseDto postResponseDto = boardService.getPostById(id).orElseThrow(() -> new NotFoundException("post is not found"));
+    return ResponseEntity.ok(postResponseDto);
   }
 
 
