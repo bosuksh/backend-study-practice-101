@@ -1,33 +1,27 @@
-package me.doflamingo.backendstudy.board.domain;
+package me.doflamingo.backendstudy.board.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 
-import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
-@Entity @AllArgsConstructor
-@Getter @Builder @NoArgsConstructor
-public class Post {
+@Getter @Builder
+@NoArgsConstructor @AllArgsConstructor
+public class PostResponseDto {
 
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Size(min = 1, max = 50, message = "제목은 1자에서 50자 사이입니다.")
   private String title;
 
   private String content;
 
-  @Size(min = 1, max = 50, message = "작성자 Id는 1자에서 30자 사이입니다.")
   private String writerId;
 
   private LocalDateTime createdAt;

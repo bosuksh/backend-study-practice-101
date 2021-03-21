@@ -2,20 +2,18 @@ package me.doflamingo.backendstudy.board.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.validator.constraints.Range;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 @Getter @Builder
 public class PostRequestDto {
 
-  @Min(value = 1, message = "제목은 최소 1자 이상입니다.")
-  @Max(value = 50, message = "제목은 최소 50자를 넘을 수 없습니다.")
+  @Size(min = 1, max = 50, message = "제목은 1자에서 50자 사이입니다.")
   private String title;
 
   private String content;
 
-  @Min(value = 1, message = "아이디는 1자 이상입니다.")
-  @Max(value = 30, message = "아이디 30자를 넘을 수 없습니다.")
+  @Size(min = 1, max = 50, message = "작성자 Id는 1자에서 30자 사이입니다.")
   private String writerId;
 }
