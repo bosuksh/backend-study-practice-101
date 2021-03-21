@@ -14,11 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -45,13 +48,7 @@ class BoardControllerTest {
                                       .content("test")
                                       .writerId("user")
                                       .build();
-    PostResponseDto mockResponse = PostResponseDto.builder()
-                                        .id(1L)
-                                        .title("Test1")
-                                        .content("test")
-                                        .writerId("user")
-                                        .createdAt(LocalDateTime.now())
-                                        .build();
+    PostResponseDto mockResponse = generateResponseDto(1L);
     given(boardService.writePost(any())).willReturn(mockResponse);
     //when
     mockMvc.perform(post("/posts")
@@ -64,4 +61,40 @@ class BoardControllerTest {
     .andExpect(header().exists(HttpHeaders.LOCATION))
     .andExpect(jsonPath("id").value(1L));
   }
+
+  @Test
+  @DisplayName("게시글 리스트 조회")
+  public void getPosts() throws Exception {
+    //given
+    PostRequestDto mockRequest = PostRequestDto.builder()
+                                   .title("Test1")
+                                   .content("test")
+                                   .writerId("user")
+                                   .build();
+    List<PostResponseDto> mockResponseList = new ArrayList<>();
+    for(long i = 1L; i < 11L; i++){
+      mockResponseList.add(generateResponseDto(i));
+    }
+
+    given(boardService.getPostList()).willReturn(mockResponseList);
+    //when
+    mockMvc.perform(get("/posts")
+                      .contentType(MediaType.APPLICATION_JSON)
+    )
+      //then
+      .andDo(print())
+      .andExpect(status().isOk());
+  }
+
+  private PostResponseDto generateResponseDto(Long id) {
+    return PostResponseDto.builder()
+             .id(id)
+             .title("Test"+id)
+             .content("test")
+             .writerId("user")
+             .createdAt(LocalDateTime.now())
+             .build();
+  }
+
+
 }
