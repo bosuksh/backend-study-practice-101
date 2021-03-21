@@ -1,14 +1,17 @@
 package me.doflamingo.backendstudy.board.service;
 
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import me.doflamingo.backendstudy.board.domain.Post;
 import me.doflamingo.backendstudy.board.dto.PostRequestDto;
 import me.doflamingo.backendstudy.board.dto.PostResponseDto;
 import me.doflamingo.backendstudy.board.repository.BoardRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,21 +31,23 @@ public class BoardService {
                   .build();
     Post savedPost = boardRepository.save(post);
 
-    return PostResponseDto.builder()
-             .id(savedPost.getId())
-             .title(savedPost.getTitle())
-             .content(savedPost.getContent())
-             .writerId(savedPost.getWriterId())
-             .createdAt(savedPost.getCreatedAt())
-             .build();
+    return changePostToPostResponseDto(savedPost);
   }
 
+  @Transactional(readOnly = true)
   public List<PostResponseDto> getPostList() {
-    return null;
+    List<Post> postList = boardRepository.findAll();
+    List<PostResponseDto> postResponseList = new ArrayList<>();
+    for (Post post : postList) {
+      postResponseList.add(changePostToPostResponseDto(post));
+    }
+    return postResponseList;
   }
 
-  public Optional<PostResponseDto> getPostById(Long id) {
-    return null;
+  @Transactional(readOnly = true)
+  public Optional<PostResponseDto> getPostById(Long id) throws NotFoundException {
+    Post findPost = boardRepository.findById(id).orElseThrow(()-> new NotFoundException("Post is Not Found"));
+    return Optional.of(changePostToPostResponseDto(findPost));
   }
 
   public Optional<PostResponseDto> updatePost(Long id, PostRequestDto requestDto) {
@@ -51,5 +56,16 @@ public class BoardService {
 
   public void deletePost(Long id) {
 
+  }
+
+  private PostResponseDto changePostToPostResponseDto(Post post) {
+    return PostResponseDto.builder()
+             .id(post.getId())
+             .title(post.getTitle())
+             .content(post.getContent())
+             .writerId(post.getWriterId())
+             .createdAt(post.getCreatedAt())
+             .updatedAt(post.getUpdatedAt())
+             .build();
   }
 }

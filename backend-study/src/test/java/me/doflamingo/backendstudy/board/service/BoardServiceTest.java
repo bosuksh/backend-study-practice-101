@@ -14,6 +14,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -34,9 +36,10 @@ class BoardServiceTest {
   @DisplayName("게시물 작성")
   public void writePost() {
     //given
-    PostRequestDto mockRequest = createRequest();
+    Long fakeId = 1L;
+    PostRequestDto mockRequest = createRequest(fakeId);
 
-    Post savedPost = CreatePost(mockRequest, 1L);
+    Post savedPost = CreatePost(mockRequest, fakeId);
 
     given(boardRepository.save(any())).willReturn(savedPost);
     //when
@@ -51,20 +54,18 @@ class BoardServiceTest {
 
   }
 
-
-
   @Test
   @DisplayName("게시물 조회 by Id")
   public void getPostById() throws Exception {
     //given
-    PostRequestDto mockRequest = createRequest();
-
     Long fakeId = 1L;
+    PostRequestDto mockRequest = createRequest(fakeId);
+
     Post savedPost = CreatePost(mockRequest, fakeId);
 
     given(boardRepository.findById(fakeId)).willReturn(Optional.of(savedPost));
     //when
-    PostResponseDto postResponseDto = boardService.getPostById(fakeId).orElseThrow(() -> new NotFoundException("post is not found"));
+    PostResponseDto postResponseDto = boardService.getPostById(fakeId).get();
 
     //then
     assertEquals(postResponseDto.getId(), fakeId);
@@ -73,6 +74,27 @@ class BoardServiceTest {
     assertNotNull(postResponseDto.getWriterId());
 
   }
+
+  @Test
+  @DisplayName("게시물 리스트 조회")
+  public void getPostList() throws Exception {
+    //given
+
+    List<Post> postList = new ArrayList<>();
+    for(long i = 1; i<= 10; i++ ) {
+      PostRequestDto mockRequest = createRequest(i);
+      postList.add(CreatePost(mockRequest, i));
+    }
+
+    given(boardRepository.findAll()).willReturn(postList);
+    //when
+    List<PostResponseDto> postResponseList = boardService.getPostList();
+
+    //then
+    assertEquals(postResponseList.size(), 10);
+
+  }
+
   private Post CreatePost(PostRequestDto mockRequest, Long id) {
     return Post.builder()
              .id(id)
@@ -82,9 +104,9 @@ class BoardServiceTest {
              .createdAt(LocalDateTime.now())
              .build();
   }
-  private PostRequestDto createRequest() {
+  private PostRequestDto createRequest(Long id) {
     return PostRequestDto.builder()
-             .title("Test1")
+             .title("Test"+id)
              .content("test")
              .writerId("user")
              .build();
